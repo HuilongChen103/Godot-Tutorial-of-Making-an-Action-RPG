@@ -6,6 +6,15 @@ const FRICTION = 500
 
 var velocity = Vector2.ZERO
 
+# 这个节点在准备好之后会加载AnimationPlayer，和下面的_ready()函数效果一样
+onready var animationPlayer = $AnimationPlayer
+
+# _ready()函数会在这个node准备好之后调用，如果它有子节点，则会在子节点的
+# _ready()函数调用完毕后调用
+#unc _ready():
+	# 这个$表示选择子节点的内容 绿色表示这个一个path to node
+#	animationPlayer = $AnimationPlayer
+
 # 游戏建议在全屏模式下运行，窗口模式总会有一些bug
 
 # 每一个physics frame都会调用一次
@@ -25,13 +34,18 @@ func _physics_process(delta):
 		# clamped函数就是返回MAX_SPEED * delta作为最大值
 		# 更准确的说是调整velocity保证它不会超过MAX_SPEED
 		#velocity = velocity.clamped(MAX_SPEED)
-		
+		if input_vector.x > 0:
+			animationPlayer.play("RunRight")
+		else:
+			animationPlayer.play("RunLeft")
 		velocity = velocity.move_toward(input_vector * MAX_SPEED, ACCELERATION * delta)
-		print(velocity)
+		
 	else:
 		# 让速度慢慢趋近于0，并且每次减少的量为Friction * delta
 		velocity = velocity.move_toward(Vector2.ZERO, FRICTION * delta)
 	
+		animationPlayer.play("IdleRight")
+		
 	# 这里的delte相当于给速度做个限制，比如游戏是60帧的话，delta就会使接近1/60
 	# 这样让角色的运动更接近于实际运动时间
 	# 让对象沿着这个vector移动，知道撞到东西
