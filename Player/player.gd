@@ -9,6 +9,11 @@ var velocity = Vector2.ZERO
 # 这个节点在准备好之后会加载AnimationPlayer，和下面的_ready()函数效果一样
 onready var animationPlayer = $AnimationPlayer
 
+onready var animationTree = $AnimationTree
+
+# playback放的是AnimationNodeState，存放的是AnimationPlayer里面的不同animation
+onready var animationState = $AnimationTree.get("parameters/playback")
+
 # _ready()函数会在这个node准备好之后调用，如果它有子节点，则会在子节点的
 # _ready()函数调用完毕后调用
 #unc _ready():
@@ -29,22 +34,19 @@ func _physics_process(delta):
 	input_vector = input_vector.normalized()
 	
 	if input_vector != Vector2.ZERO:
-		# velocity = input_vector* MAX_SPEED
-		#velocity += input_vector * ACCELERATION * delta
-		# clamped函数就是返回MAX_SPEED * delta作为最大值
-		# 更准确的说是调整velocity保证它不会超过MAX_SPEED
-		#velocity = velocity.clamped(MAX_SPEED)
-		if input_vector.x > 0:
-			animationPlayer.play("RunRight")
-		else:
-			animationPlayer.play("RunLeft")
+		# 设置blend_position的位置用于动画树播放动画
+		print(input_vector)
+		animationTree.set("parameters/Idle/blend_position", input_vector)
+		animationTree.set("parameters/Run/blend_position", input_vector)
+		animationState.travel("Run")
 		velocity = velocity.move_toward(input_vector * MAX_SPEED, ACCELERATION * delta)
 		
 	else:
 		# 让速度慢慢趋近于0，并且每次减少的量为Friction * delta
+
+		animationState.travel("Idle")
+		print("velocity:", velocity)
 		velocity = velocity.move_toward(Vector2.ZERO, FRICTION * delta)
-	
-		animationPlayer.play("IdleRight")
 		
 	# 这里的delte相当于给速度做个限制，比如游戏是60帧的话，delta就会使接近1/60
 	# 这样让角色的运动更接近于实际运动时间
