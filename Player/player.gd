@@ -35,7 +35,6 @@ func _physics_process(delta):
 	
 	if input_vector != Vector2.ZERO:
 		# 设置blend_position的位置用于动画树播放动画
-		print(input_vector)
 		animationTree.set("parameters/Idle/blend_position", input_vector)
 		animationTree.set("parameters/Run/blend_position", input_vector)
 		animationState.travel("Run")
@@ -43,9 +42,7 @@ func _physics_process(delta):
 		
 	else:
 		# 让速度慢慢趋近于0，并且每次减少的量为Friction * delta
-
 		animationState.travel("Idle")
-		print("velocity:", velocity)
 		velocity = velocity.move_toward(Vector2.ZERO, FRICTION * delta)
 		
 	# 这里的delte相当于给速度做个限制，比如游戏是60帧的话，delta就会使接近1/60
